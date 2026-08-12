@@ -1,0 +1,5 @@
+# Cloudflare Pages — en-tête de non-indexation sur TOUT (y compris le PDF,
+# où une balise meta n'aurait aucun effet).
+/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Referrer-Policy: no-referrer

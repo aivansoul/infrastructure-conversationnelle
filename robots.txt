@@ -1,0 +1,3 @@
+# Document commercial privé — aucune indexation souhaitée
+User-agent: *
+Disallow: /

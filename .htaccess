@@ -1,0 +1,6 @@
+# Hostinger / LiteSpeed / Apache — non-indexation de tout le dossier,
+# PDF compris (une balise meta ne fonctionne pas dans un PDF).
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+  Header set Referrer-Policy "no-referrer"
+</IfModule>
