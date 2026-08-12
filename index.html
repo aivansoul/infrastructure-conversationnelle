@@ -58,8 +58,12 @@ a{text-decoration:none;color:inherit}
 .section h2{font-size:28px;letter-spacing:-.03em;color:var(--navy);margin:0}.section-head p{max-width:650px;color:var(--muted);margin:0;font-size:14px}
 .flow{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:16px}
 .step{min-height:172px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;position:relative;box-shadow:0 8px 18px rgba(11,31,58,.05)}
-.step .num{width:26px;height:26px;border-radius:7px;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;margin-bottom:14px}
+.step .srow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.step .num{width:26px;height:26px;border-radius:7px;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:0 0 auto}
+.step .sico{flex:0 0 auto;display:grid;place-items:center}
+.step .sico svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .step h4{font-size:12px;margin:0 0 8px;letter-spacing:.01em}.step p{font-size:11px;color:var(--muted);margin:0}.step small{display:block;margin-top:10px;font-size:10px;color:#8190a3}
+.step:nth-child(1) .sico{color:var(--blue)}.step:nth-child(2) .sico{color:var(--purple)}.step:nth-child(3) .sico{color:var(--red)}.step:nth-child(4) .sico{color:var(--green)}.step:nth-child(5) .sico{color:var(--gold)}.step:nth-child(6) .sico{color:var(--blue)}.step:nth-child(7) .sico{color:var(--purple)}
 .step:nth-child(1) .num{background:var(--blue)}.step:nth-child(2) .num{background:var(--purple)}.step:nth-child(3) .num{background:var(--red)}.step:nth-child(4) .num{background:var(--green)}.step:nth-child(5) .num{background:var(--gold)}.step:nth-child(6) .num{background:var(--blue)}.step:nth-child(7) .num{background:var(--purple)}
 .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .layer{padding:22px}.layer .bar{height:5px;border-radius:999px;margin-bottom:18px}.layer.red .bar{background:var(--red)}.layer.green .bar{background:var(--green)}.layer.gold .bar{background:var(--gold)}
@@ -139,7 +143,7 @@ footer .fendorse-en{margin:0 0 18px;font-size:11px;color:#8190a3;max-width:820px
   <div class="container nav">
     <div class="brand"><img src="assets/banana-navy-logo.png" alt="Banana Navy" width="400" height="238"><span>INFRASTRUCTURE CONVERSATIONNELLE SÉCURISÉE</span></div>
     <div class="navlinks">
-      <a href="#fonctionnement">Fonctionnement</a><a href="#securite">Sécurité</a><a href="#secteurs">Secteurs</a><a href="#technologie">Technologie</a>
+      <a href="#fonctionnement">Fonctionnement</a><a href="#securite">Sécurité</a><a href="#secteurs">Secteurs</a><a href="#technologie">Technologie</a><a href="architecture.html">Architecture détaillée</a>
     </div>
     <a class="cta" href="#contact">Demander une démonstration</a>
   </div>
@@ -148,8 +152,8 @@ footer .fendorse-en{margin:0 0 18px;font-size:11px;color:#8190a3;max-width:820px
 <header class="hero">
   <div class="container">
     <div class="alarm">
-      <p class="alarm-head"><span class="u">Stop aux bots</span> <span class="u">talkie-walkie !</span></p>
-      <p class="alarm-sub">L’ère <b>FULL-DUPLEX</b> sécurisée est enfin sur le marché !</p>
+      <p class="alarm-head"><span class="u">Voice Bot de crise</span> — <span class="u">Architecture &amp; fonctionnement</span></p>
+      <p class="alarm-sub">Détection <b>ultra-rapide</b> • Conversation sécurisée • Amélioration vocale (VRD)</p>
     </div>
     <span class="eyebrow">Infrastructure vocale intelligente • Sécurisée • Haute disponibilité</span>
     <h1>Une technologie conversationnelle fiable, conçue pour les environnements où l’erreur n’est pas une option.</h1>
@@ -179,6 +183,18 @@ footer .fendorse-en{margin:0 0 18px;font-size:11px;color:#8190a3;max-width:820px
 </header>
 
 <main>
+<section class="section" id="fonctionnement"><div class="container">
+  <div class="section-head"><div><h2>Un flux opérationnel clair, de l’appel à la décision</h2></div><p>La structure reprend le fonctionnement du système en sept étapes, tout en présentant la technologie sous un angle commercial et compréhensible.</p></div>
+  <div class="glass flow">
+    <div class="step"><div class="srow"><div class="num">1</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M6 3h4l2 5-3 2a12 12 0 005 5l2-3 5 2v4a2 2 0 01-2 2A16 16 0 014 5a2 2 0 012-2z"/></svg></div></div><h4>Entrée télécom</h4><p>Réception des appels ou interactions via les canaux officiels de l’organisation.</p><small>SIP, opérateur, ligne dédiée, numéro officiel</small></div>
+    <div class="step"><div class="srow"><div class="num">2</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-5"/></svg></div></div><h4>Protection réseau</h4><p>Filtrage des appels anormaux, tentatives de fraude, surcharge ou comportements automatisés.</p><small><span class="nb">Anti-DDoS</span>, <span class="nb">anti-fraude</span>, filtrage SIP</small></div>
+    <div class="step"><div class="srow"><div class="num">3</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M2 12h2M6 8v8M10 4v16M14 9v6"/><circle cx="19" cy="11" r="3.2"/><path d="M21.4 13.4L23 15"/></svg></div></div><h4>Analyse audio</h4><p>Le signal est analysé pour repérer bruit, replays, anomalies ou signaux suspects.</p><small>Analyse vocale et détection d’anomalies</small></div>
+    <div class="step"><div class="srow"><div class="num">4</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M4 5h16v10H8l-4 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></div></div><h4>Compréhension métier</h4><p>Le moteur comprend la langue, l’intention, le contexte et les règles propres à votre organisation.</p><small>Intentions, contexte, base de connaissance</small></div>
+    <div class="step"><div class="srow"><div class="num">5</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M12 4v16M5 8h14"/><path d="M8 8l-3 6h6l-3-6zm8 0l-3 6h6l-3-6z"/><path d="M9 20h6"/></svg></div></div><h4>Décision & routage</h4><p>Réponse automatisée, escalade, transfert humain ou déclenchement d’un scénario précis.</p><small>Règles métier, priorités, niveaux de risque</small></div>
+    <div class="step"><div class="srow"><div class="num">6</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M3 12l18-8-8 18-2-8z"/></svg></div></div><h4>Sorties sécurisées</h4><p>Envoi d’informations, notifications, transferts et mises à jour vers les systèmes autorisés.</p><small>CRM, SMS, messagerie, opérateurs</small></div>
+    <div class="step"><div class="srow"><div class="num">7</div><div class="sico"><svg viewBox="0 0 24 24"><path d="M2 12h3M8 7v10M14 4v16M20 9v6"/><path d="M17 3c2 2 2 5 0 7"/></svg></div></div><h4>Optimisation vocale</h4><p>Réduction du bruit et amélioration de la qualité pour maintenir une conversation intelligible.</p><small>Nettoyage audio et restitution claire</small></div>
+  </div>
+</div></section>
 <section class="section"><div class="container">
   <div class="section-head"><div><h2>Une technologie conçue pour les environnements exigeants</h2></div><p>Notre proposition de valeur repose sur la sécurité, la continuité de service et la maîtrise des décisions automatisées — pas uniquement sur la capacité à converser.</p></div>
   <div class="glass proof">
@@ -191,18 +207,6 @@ footer .fendorse-en{margin:0 0 18px;font-size:11px;color:#8190a3;max-width:820px
       <img src="assets/badge-strike-it.png" alt="CY.D3F Factory — STRIKE IT" width="823" height="531">
       <img src="assets/badge-cyberforce.png" alt="Cyber Force" width="157" height="200">
     </div>
-  </div>
-</div></section>
-<section class="section" id="fonctionnement"><div class="container">
-  <div class="section-head"><div><h2>Un flux opérationnel clair, de l’appel à la décision</h2></div><p>La structure reprend le fonctionnement du système en sept étapes, tout en présentant la technologie sous un angle commercial et compréhensible.</p></div>
-  <div class="glass flow">
-    <div class="step"><div class="num">1</div><h4>Entrée télécom</h4><p>Réception des appels ou interactions via les canaux officiels de l’organisation.</p><small>SIP, opérateur, ligne dédiée, numéro officiel</small></div>
-    <div class="step"><div class="num">2</div><h4>Protection réseau</h4><p>Filtrage des appels anormaux, tentatives de fraude, surcharge ou comportements automatisés.</p><small><span class="nb">Anti-DDoS</span>, <span class="nb">anti-fraude</span>, filtrage SIP</small></div>
-    <div class="step"><div class="num">3</div><h4>Analyse audio</h4><p>Le signal est analysé pour repérer bruit, replays, anomalies ou signaux suspects.</p><small>Analyse vocale et détection d’anomalies</small></div>
-    <div class="step"><div class="num">4</div><h4>Compréhension métier</h4><p>Le moteur comprend la langue, l’intention, le contexte et les règles propres à votre organisation.</p><small>Intentions, contexte, base de connaissance</small></div>
-    <div class="step"><div class="num">5</div><h4>Décision & routage</h4><p>Réponse automatisée, escalade, transfert humain ou déclenchement d’un scénario précis.</p><small>Règles métier, priorités, niveaux de risque</small></div>
-    <div class="step"><div class="num">6</div><h4>Sorties sécurisées</h4><p>Envoi d’informations, notifications, transferts et mises à jour vers les systèmes autorisés.</p><small>CRM, SMS, messagerie, opérateurs</small></div>
-    <div class="step"><div class="num">7</div><h4>Optimisation vocale</h4><p>Réduction du bruit et amélioration de la qualité pour maintenir une conversation intelligible.</p><small>Nettoyage audio et restitution claire</small></div>
   </div>
 </div></section>
 

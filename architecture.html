@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Voicebot de crise — Architecture &amp; fonctionnement</title>
+<meta name="description" content="Architecture et fonctionnement du voicebot de crise Banana Navy : détection ultra-rapide, conversation sécurisée, amélioration vocale." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d2149;
+  --navy-2:#16386e;
+  --blue:#1c63b7;
+  --purple:#6b4bc3;
+  --red:#c0392b;
+  --green:#2e8b57;
+  --gold:#c7932f;
+  --ink:#152033;
+  --muted:#5f6d82;
+  --line:#dbe3ee;
+  --soft:#f6f8fb;
+  --tint-blue:#f2f7fd;
+  --tint-purple:#f6f4fd;
+  --tint-red:#fdf3f3;
+  --tint-green:#f1f9f4;
+  --tint-gold:#fdf8ed;
+  --shadow:0 8px 20px rgba(13,33,73,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#eef2f7;color:var(--ink);line-height:1.35}
+a{text-decoration:none;color:inherit}
+.nb{white-space:nowrap}
+.sheet{width:min(1320px,calc(100% - 20px));margin:12px auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 30px rgba(13,33,73,.09);padding:18px}
+
+/* ---------- En-tete ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:28px;width:auto;display:block}
+.brand span{font-size:10.5px;font-weight:800;letter-spacing:.02em;color:var(--navy);line-height:1.2;max-width:190px}
+.tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tlink{font-size:12px;font-weight:700;color:var(--blue);display:inline-flex;align-items:center;gap:6px}
+.tlink:hover{color:var(--navy)}
+.tlink svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.masthead{text-align:center;padding:0 0 12px}
+.masthead h1{margin:0 0 4px;font-size:clamp(17px,2.3vw,27px);line-height:1.1;letter-spacing:-.03em;color:var(--navy);font-weight:800;text-transform:uppercase}
+.masthead p{margin:0;font-size:clamp(11px,1.1vw,13px);color:var(--muted);font-weight:600}
+
+/* ---------- Blocs ---------- */
+.block{margin-bottom:10px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.bar{background:var(--navy);color:#fff;text-align:center;padding:7px 12px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.block .body{padding:10px}
+
+/* ---------- Promesse ---------- */
+.promise{display:grid;grid-template-columns:repeat(3,1fr)}
+.promise .p{display:flex;gap:10px;align-items:center;padding:10px 12px;border-left:1px solid var(--line)}
+.promise .p:first-child{border-left:0}
+.promise .ico{flex:0 0 auto;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--tint-blue);color:var(--navy)}
+.promise .ico svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7}
+.promise h3{margin:0 0 2px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--navy)}
+.promise p{margin:0;font-size:11.5px;color:var(--muted);line-height:1.3}
+
+/* ---------- Flux 7 etapes ---------- */
+.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.step{border:1px solid var(--line);border-radius:9px;overflow:hidden;display:flex;flex-direction:column}
+.step .head{display:flex;align-items:center;gap:6px;padding:6px 7px;color:#fff}
+.step .n{flex:0 0 auto;width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,.24);display:grid;place-items:center;font-size:10px;font-weight:800}
+.step .head h4{margin:0;font-size:9px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;line-height:1.15}
+.step .txt{padding:7px 8px 4px;font-size:10.5px;line-height:1.3;flex:1 1 auto}
+.step .art{display:grid;place-items:center;padding:2px 8px 4px}
+.step .art svg{width:40px;height:24px;stroke:currentColor;fill:none;stroke-width:1.6}
+.step .foot{padding:6px 8px;font-size:9.5px;color:var(--muted);border-top:1px dashed var(--line);line-height:1.3}
+.s1 .head{background:var(--navy)} .s1 .art{color:var(--navy)} .s1{background:var(--tint-blue)}
+.s2 .head{background:var(--purple)} .s2 .art{color:var(--purple)} .s2{background:var(--tint-purple)}
+.s3 .head{background:var(--red)} .s3 .art{color:var(--red)} .s3{background:var(--tint-red)}
+.s4 .head{background:var(--green)} .s4 .art{color:var(--green)} .s4{background:var(--tint-green)}
+.s5 .head{background:var(--gold)} .s5 .art{color:var(--gold)} .s5{background:var(--tint-gold)}
+.s6 .head{background:var(--blue)} .s6 .art{color:var(--blue)} .s6{background:var(--tint-blue)}
+.s7 .head{background:var(--purple)} .s7 .art{color:var(--purple)} .s7{background:var(--tint-purple)}
+
+/* ---------- 3 couches ---------- */
+.layers{display:grid;grid-template-columns:repeat(3,1fr) .8fr;gap:8px}
+.lay{border:1px solid var(--line);border-radius:9px;overflow:hidden;display:flex;flex-direction:column}
+.lay .lhead{padding:6px 10px;color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;text-align:center}
+.lay .lsub{padding:5px 10px;font-size:10.5px;font-weight:700;text-align:center;border-bottom:1px solid var(--line)}
+.lay .items{padding:7px;display:flex;flex-direction:column;gap:5px;flex:1 1 auto}
+.it{display:flex;gap:7px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:7px;padding:5px 7px}
+.it svg{width:14px;height:14px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.8;margin-top:1px}
+.it b{display:block;font-size:10.5px;font-weight:700;line-height:1.2}
+.it span{font-size:9.5px;color:var(--muted);line-height:1.25}
+.lay .lfoot{padding:6px 10px;font-size:10px;font-weight:700;text-align:center;border-top:1px solid var(--line)}
+.lay-a .lhead{background:var(--red)} .lay-a{background:var(--tint-red)} .lay-a .it svg{color:var(--red)} .lay-a .lfoot{color:var(--red)}
+.lay-b .lhead{background:var(--green)} .lay-b{background:var(--tint-green)} .lay-b .it svg{color:var(--green)} .lay-b .lfoot{color:var(--green)}
+.lay-c .lhead{background:var(--gold)} .lay-c{background:var(--tint-gold)} .lay-c .it svg{color:var(--gold)} .lay-c .lfoot{color:#8a6417}
+.lay-d .lhead{background:var(--navy)} .lay-d{background:var(--tint-blue)} .lay-d .it svg{color:var(--navy)}
+.alert{margin-top:auto;display:flex;gap:6px;align-items:flex-start;background:#fff;border:1px solid #f0cfcf;border-radius:7px;padding:6px 7px;font-size:9.5px;color:var(--red);font-weight:600;line-height:1.25}
+.alert svg{width:14px;height:14px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.9}
+
+/* ---------- Dropdowns ---------- */
+.acc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;align-items:start;margin-bottom:10px}
+details.d{border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:var(--shadow);overflow:hidden}
+details.d[open]{grid-column:1/-1}
+details.d summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);background:var(--soft)}
+details.d summary::-webkit-details-marker{display:none}
+details.d summary:after{content:'+';font-size:17px;font-weight:400;color:var(--muted);line-height:1}
+details.d[open] summary:after{content:'–'}
+details.d summary:hover{background:#eef3f9}
+details.d .dbody{padding:10px;border-top:1px solid var(--line)}
+
+/* ---------- Explication simple ---------- */
+.simple{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+.rows{display:flex;flex-direction:column;gap:5px}
+.row{display:grid;grid-template-columns:19px 150px 1fr;gap:9px;align-items:start}
+.row .n{width:19px;height:19px;border-radius:5px;color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800}
+.row .lb{font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;padding-top:2px}
+.row .tx{font-size:11px;color:var(--muted);padding-top:2px;line-height:1.35}
+.n1{background:var(--navy)} .n2{background:var(--purple)} .n3{background:var(--red)} .n4{background:var(--green)} .n5{background:var(--gold)} .n6{background:var(--blue)} .n7{background:var(--purple)}
+.c1{color:var(--navy)} .c2{color:var(--purple)} .c3{color:var(--red)} .c4{color:var(--green)} .c5{color:var(--gold)} .c6{color:var(--blue)} .c7{color:var(--purple)}
+.behind{border:1px solid var(--line);border-radius:9px;background:var(--soft);padding:11px}
+.behind h4{margin:0 0 9px;text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}
+.behind .b{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line)}
+.behind .b:first-of-type{border-top:0}
+.behind .b svg{width:18px;height:18px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.7;color:var(--blue)}
+.behind .b p{margin:0;font-size:11px;color:var(--muted);line-height:1.35}
+
+/* ---------- Grilles ---------- */
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.cell{display:flex;gap:8px;align-items:flex-start;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.cell svg{width:19px;height:19px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.7;color:var(--navy)}
+.cell b{display:block;font-size:10.5px;font-weight:800;margin-bottom:2px;line-height:1.2}
+.cell span{font-size:9.5px;color:var(--muted);line-height:1.3}
+
+/* ---------- Benefices ---------- */
+.benefits{background:var(--navy);border-radius:11px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:10px}
+.benefits .bar{background:transparent;border-bottom:1px solid rgba(255,255,255,.16)}
+.bgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(255,255,255,.14)}
+.ben{background:var(--navy);padding:10px 9px;display:flex;flex-direction:column;gap:5px}
+.ben svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:1.7}
+.ben b{font-size:10.5px;color:#fff;line-height:1.25}
+.ben span{font-size:9.5px;color:rgba(255,255,255,.72);line-height:1.3}
+
+/* ---------- Pied de page ---------- */
+.foot{border:1px solid var(--line);border-radius:11px;background:var(--soft);padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
+.fb{display:flex;align-items:center;gap:11px}
+.fb img{height:34px;width:auto;display:block}
+.fb .ftag{margin:0;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--navy);line-height:1.3;max-width:150px}
+.fbadges{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 18px}
+.fbadges img{height:32px;width:auto;display:block;object-fit:contain}
+.fc{text-align:right;font-size:11px;color:var(--muted);line-height:1.5}
+.fc .who{display:block;font-weight:800;color:var(--navy);font-size:12px}
+.fc a{color:var(--navy);font-weight:600}
+.fc a:hover{color:var(--blue)}
+.fend{margin:10px 0 0;font-size:10px;color:var(--muted);line-height:1.4;text-align:center}
+.fend em{display:block;color:#8190a3;font-size:9.5px;margin-top:2px}
+
+/* ---------- Responsive ---------- */
+@media(max-width:1240px){
+  .flow{grid-template-columns:repeat(4,1fr)}
+  .layers{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .bgrid{grid-template-columns:repeat(3,1fr)}
+  .acc{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:860px){
+  .promise{grid-template-columns:1fr}
+  .promise .p{border-left:0;border-top:1px solid var(--line)}
+  .promise .p:first-child{border-top:0}
+  .simple{grid-template-columns:1fr}
+  .foot{grid-template-columns:1fr;gap:12px;text-align:center}
+  .fc{text-align:center}
+  .fb{justify-content:center}
+}
+@media(max-width:600px){
+  .sheet{width:calc(100% - 12px);padding:12px;margin:8px auto}
+  .flow{grid-template-columns:1fr}
+  .layers{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .bgrid{grid-template-columns:1fr}
+  .acc{grid-template-columns:1fr}
+  .row{grid-template-columns:19px 1fr;row-gap:2px}
+  .row .tx{grid-column:2}
+  .brand span{display:none}
+}
+@media print{
+  body{background:#fff}
+  .sheet{width:100%;margin:0;border:0;box-shadow:none;padding:6px}
+  .tools{display:none}
+  details.d{grid-column:1/-1}
+  details.d .dbody{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="topbar">
+    <div class="brand">
+      <img src="assets/banana-navy-logo.png" alt="Banana Navy" width="400" height="238">
+      <span>INFRASTRUCTURE CONVERSATIONNELLE SÉCURISÉE</span>
+    </div>
+    <div class="tools">
+      <a class="tlink" href="#" id="toggleAll"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg> Tout déplier</a>
+      <a class="tlink" href="index.html"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg> Retour à la présentation</a>
+    </div>
+  </div>
+
+  <div class="masthead">
+    <h1>Voicebot de crise — Architecture &amp; fonctionnement</h1>
+    <p>Détection <span class="nb">ultra-rapide</span> • Conversation sécurisée • Amélioration vocale (VRD)</p>
+  </div>
+
+  <!-- ============ PROMESSE ============ -->
+  <section class="block">
+    <div class="bar">Notre promesse</div>
+    <div class="promise">
+      <div class="p">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-5"/></svg></div>
+        <div><h3>Sécurisé</h3><p>Défense en profondeur contre les attaques et usurpations.</p></div>
+      </div>
+      <div class="p">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg></div>
+        <div><h3><span class="nb">Ultra-rapide</span></h3><p>Détection en &lt; 2 secondes et réponse immédiate.</p></div>
+      </div>
+      <div class="p">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10h14v9H5z"/><path d="M8 19v-6m4 6v-6m4 6v-6"/></svg></div>
+        <div><h3>Souverain</h3><p>Données hébergées en Belgique / UE.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FLUX ============ -->
+  <section class="block">
+    <div class="bar">Flux global — étape par étape</div>
+    <div class="body">
+      <div class="flow">
+        <div class="step s1">
+          <div class="head"><span class="n">1</span><h4>Appel entrant</h4></div>
+          <div class="txt">Un citoyen appelle le numéro officiel.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><circle cx="13" cy="9" r="4.5"/><path d="M5 25c0-4.5 3.5-8 8-8s8 3.5 8 8"/><path d="M31 7c6 0 11 5 11 11M31 13c3 0 5 2 5 5"/><path d="M32 21l4 4-3 3-6-6z"/></svg></div>
+          <div class="foot">Réseau télécom (opérateur / SIP Trunk)</div>
+        </div>
+        <div class="step s2">
+          <div class="head"><span class="n">2</span><h4>Couche sécurité télécom</h4></div>
+          <div class="txt">Le système vérifie et nettoie l’appel en temps réel.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><path d="M24 2l10 4v7c0 7-4.5 11.5-10 14-5.5-2.5-10-7-10-14V6z"/><path d="M20 14l3 3 6-6"/></svg></div>
+          <div class="foot">SBC entreprise, <span class="nb">Anti-DDoS</span>, <span class="nb">anti-fraude</span>, filtrage SIP / RTP</div>
+        </div>
+        <div class="step s3">
+          <div class="head"><span class="n">3</span><h4>Couche sécurité audio (en parallèle)</h4></div>
+          <div class="txt">Analyse du son pour détecter anomalies et attaques vocales.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><path d="M3 15h3M9 8v14M15 4v22M21 10v10M27 13v4"/><circle cx="37" cy="15" r="6.5"/><path d="M42 20l4 5"/></svg></div>
+          <div class="foot">VAD, <span class="nb">anti-spoofing</span>, deepfake, scoring de risque</div>
+        </div>
+        <div class="step s4">
+          <div class="head"><span class="n">4</span><h4>Voicebot métier (en parallèle)</h4></div>
+          <div class="txt">Le bot comprend, répond et guide l’appelant selon le scénario.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><rect x="16" y="8" width="17" height="14" rx="5"/><circle cx="21.5" cy="15" r="1.5"/><circle cx="27.5" cy="15" r="1.5"/><path d="M24.5 4v4M12 13v5M37 13v5"/></svg></div>
+          <div class="foot">Détection langue, intentions, réponses contextuelles</div>
+        </div>
+        <div class="step s5">
+          <div class="head"><span class="n">5</span><h4>Décision &amp; routage</h4></div>
+          <div class="txt">Évaluation du risque + décision automatique du prochain pas.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><path d="M24 4v22M14 8h20"/><path d="M17 8l-4 8h8l-4-8zm14 0l-4 8h8l-4-8z"/><path d="M18 26h12"/></svg></div>
+          <div class="foot">Si danger vital → 112. Si besoin humain → transfert opérateur.</div>
+        </div>
+        <div class="step s6">
+          <div class="head"><span class="n">6</span><h4>Sorties sécurisées</h4></div>
+          <div class="txt">L’information est envoyée via les canaux officiels et tracés.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><path d="M4 8h15v10H4z"/><path d="M4 8l7.5 5.5L19 8"/><rect x="24" y="6" width="8" height="16" rx="2"/><ellipse cx="41" cy="9" rx="5" ry="2.2"/><path d="M36 9v10c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V9"/></svg></div>
+          <div class="foot">Opérateur, SMS / WhatsApp, bases officielles, logs</div>
+        </div>
+        <div class="step s7">
+          <div class="head"><span class="n">7</span><h4>Amélioration vocale (VRD)</h4></div>
+          <div class="txt">La voix est nettoyée et restituée clairement à l’appelant.</div>
+          <div class="art"><svg viewBox="0 0 48 30"><path d="M3 15h2M9 10v10M15 5v20M21 9v12M27 12v6M33 7v16M39 11v8M45 14v2"/></svg></div>
+          <div class="foot">Réduction bruit, échos, clarté &amp; naturel</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 COUCHES ============ -->
+  <section class="block">
+    <div class="bar">Les 3 couches en parallèle</div>
+    <div class="body">
+      <div class="layers">
+
+        <div class="lay lay-a">
+          <div class="lhead">A. Couche sécurité audio</div>
+          <div class="lsub">Analyse le son en temps réel</div>
+          <div class="items">
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M3 12h2M8 7v10M12 4v16M16 9v6M20 11v2"/></svg><div><b>Capture &amp; normalisation</b><span>FFmpeg</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 12h3M10 8v8M14 5v14M18 10v4"/></svg><div><b>VAD (Silero)</b><span>Détecte la voix</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 20V10M9 20V5M14 20v-8M19 20V8"/></svg><div><b>Extraction de caractéristiques</b><span>MFCC, spectrogrammes…</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12h6"/></svg><div><b>Détection deepfake / replay</b><span>AASIST</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 3 10 3-8 2 3h4"/></svg><div><b>Détection bruits / parasites</b><span>Artefacts et signal parasite</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>Scoring de risque</b><span>ML + règles</span></div></div>
+            <div class="alert"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><span>Si risque élevé → blocage ou alerte SOC</span></div>
+          </div>
+          <div class="lfoot">Contrôle indépendant du modèle d’IA</div>
+        </div>
+
+        <div class="lay lay-b">
+          <div class="lhead">B. Voicebot métier</div>
+          <div class="lsub">Comprend et répond intelligemment</div>
+          <div class="items">
+            <div class="it"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg><div><b>Détection langue</b><span>FR / NL / EN</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 5h16v10H7l-3 3z"/></svg><div><b>Message d’accueil &amp; disclaimer</b><span>Cadre légal annoncé</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><div><b>Détection urgence vitale</b><span>Keyword spotting + intent</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><div><b>Collecte d’infos</b><span>Localisation, besoin</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg><div><b>Recherche d’infos</b><span>RAG + bases officielles</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="4"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><path d="M12 3v4"/></svg><div><b>Génération de réponse</b><span>LLM sécurisé</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M3 12h2M8 8v8M12 5v14M16 9v6M20 11v2"/></svg><div><b>Synthèse vocale (TTS)</b><span>+ amélioration VRD</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 4l16 8-16 8 4-8z"/></svg><div><b>Envoi réponse</b><span>Audio / SMS / WhatsApp</span></div></div>
+          </div>
+          <div class="lfoot">Réponse courte, fiable et traçable</div>
+        </div>
+
+        <div class="lay lay-c">
+          <div class="lhead">C. Décision &amp; routage</div>
+          <div class="lsub">Choisit la meilleure action</div>
+          <div class="items">
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-5"/></svg><div><b>Évaluation risque global</b><span>Audio + intention + contexte</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M12 4v16M5 8h14"/><path d="M8 8l-3 6h6l-3-6zm8 0l-3 6h6l-3-6z"/></svg><div><b>Règles métier &amp; priorités</b><span>Seuils configurables</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 12h5l2-5 3 10 2-5h4"/></svg><div><b>Danger vital</b><span>Transfert immédiat 112</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-4 2-7 6-7s6 3 6 7M17 8h5M19.5 5.5v5"/></svg><div><b>Besoin humain</b><span>Transfert opérateur</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M5 7h14v10H8l-3 3z"/><path d="M9 12h6"/></svg><div><b>Pas de danger</b><span>Info automatisée</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><div><b>Traçabilité &amp; logs</b><span>Décisions horodatées</span></div></div>
+          </div>
+          <div class="lfoot">Décision en &lt; 2 secondes</div>
+        </div>
+
+        <div class="lay lay-d">
+          <div class="lhead">Sorties sécurisées</div>
+          <div class="items">
+            <div class="it"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-7 7-7s7 3 7 7"/></svg><div><b>Opérateur humain</b><span>Interface sécurisée</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M4 6h16v11H9l-5 4z"/><path d="M9 11h6"/></svg><div><b>SMS / WhatsApp</b><span>Liens officiels</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10h14v9H5z"/><path d="M8 19v-6m4 6v-6m4 6v-6"/></svg><div><b>Bases officielles</b><span>SPF, coordinateur, etc.</span></div></div>
+            <div class="it"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 11h6M9 14h4"/></svg><div><b>Logs &amp; monitoring</b><span>SOC / SIEM</span></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DROPDOWNS ============ -->
+  <div class="acc">
+
+    <details class="d">
+      <summary>Fonctionnement expliqué simplement</summary>
+      <div class="dbody">
+        <div class="simple">
+          <div class="rows">
+            <div class="row"><span class="n n1">1</span><span class="lb c1">Appel entrant</span><span class="tx">Un citoyen appelle le numéro officiel de crise.</span></div>
+            <div class="row"><span class="n n2">2</span><span class="lb c2">Sécurité télécom</span><span class="tx">On vérifie que l’appel vient d’une vraie ligne, on bloque les robots, les appels frauduleux et les attaques réseau.</span></div>
+            <div class="row"><span class="n n3">3</span><span class="lb c3">Sécurité audio</span><span class="tx">On écoute le son (pas les mots au début) pour détecter usurpation de voix, enregistrements, bruits anormaux, etc.</span></div>
+            <div class="row"><span class="n n4">4</span><span class="lb c4">Voicebot métier</span><span class="tx">Le bot comprend la langue, l’intention et guide la personne selon le scénario (info, urgence, besoin d’aide…).</span></div>
+            <div class="row"><span class="n n5">5</span><span class="lb c5">Décision &amp; routage</span><span class="tx">Le système décide automatiquement : répondre, envoyer un lien, ou transférer à un humain / 112 si nécessaire.</span></div>
+            <div class="row"><span class="n n6">6</span><span class="lb c6">Sorties sécurisées</span><span class="tx">L’information est envoyée de façon sécurisée et tracée (opérateur, SMS, bases officielles, logs).</span></div>
+            <div class="row"><span class="n n7">7</span><span class="lb c7">Amélioration vocale</span><span class="tx">La voix de l’appelant et du bot est nettoyée pour une conversation claire, même avec du bruit.</span></div>
+          </div>
+          <aside class="behind">
+            <h4>Ce qui se passe derrière (en coulisses)</h4>
+            <div class="b"><svg viewBox="0 0 24 24"><path d="M4 18a8 8 0 1116 0"/><path d="M12 14l4-4"/></svg><p>Tout fonctionne en parallèle pour être <span class="nb">ultra-rapide</span>.</p></div>
+            <div class="b"><svg viewBox="0 0 24 24"><path d="M9 3a4 4 0 00-4 4 3 3 0 00-1 5 3 3 0 002 5 3 3 0 005 1 3 3 0 005-1 3 3 0 002-5 3 3 0 00-1-5 4 4 0 00-4-4 3 3 0 00-4 0z"/></svg><p>L’IA comprend et génère des réponses adaptées en temps réel.</p></div>
+            <div class="b"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-5"/></svg><p>Toutes les décisions sont sécurisées, traçables et conformes aux normes (GDPR, NIS2, ISO 27001).</p></div>
+            <div class="b"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><p>En cas de doute, le système préfère toujours la sécurité et alerte un humain.</p></div>
+          </aside>
+        </div>
+      </div>
+    </details>
+
+    <details class="d">
+      <summary>Technologies &amp; outils</summary>
+      <div class="dbody">
+        <div class="grid">
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M8 9h8M8 13h8"/></svg><div><b>Réseau &amp; sécurité télécom</b><span>Proximus SBC, SIP Trunk, Kamailio, RTPengine, <span class="nb">Anti-DDoS</span></span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M3 12h2M8 7v10M12 4v16M16 9v6M20 11v2"/></svg><div><b>Traitement audio temps réel</b><span>FFmpeg, Silero VAD, AASIST, Librosa, spectrogrammes</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="4"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><path d="M12 3v4"/></svg><div><b>Voicebot &amp; IA conversationnelle</b><span>RAG, LLM (local), intentions, keywords, multilingue</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v6c0 2 3 3 7 3s7-1 7-3V5M5 11v6c0 2 3 3 7 3s7-1 7-3v-6"/></svg><div><b>Base de données &amp; mémoire</b><span>PostgreSQL (PGVector), Neo4j, Supabase</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 11l7-3M8.5 13l7 3"/></svg><div><b>Automatisation &amp; workflows</b><span>n8n : workflows, intégrations, actions automatiques</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M3 12h2M8 8v8M12 5v14M16 9v6M20 11v2"/></svg><div><b>Synthèse &amp; amélioration vocale</b><span>ElevenLabs (TTS), VRD, suppression bruit / échos</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H4zM8 21h8"/><path d="M8 9h8M8 13h4"/></svg><div><b>Interfaces &amp; supervision</b><span>Interface opérateur sécurisée, tableaux de bord</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12h6"/></svg><div><b>Monitoring &amp; sécurité</b><span>Logs centralisés, SIEM, alertes SOC, traçabilité</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10h14v9H5z"/><path d="M9 19v-5h6v5"/></svg><div><b>Stockage &amp; hébergement</b><span>Hébergé en Belgique / UE, haute disponibilité</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg><div><b>Développement &amp; intégration</b><span>APIs, webhooks, FastAPI, intégrations métiers</span></div></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="d">
+      <summary>Cas d’usage principaux</summary>
+      <div class="dbody">
+        <div class="grid">
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 00-3 11v3h6v-3a6 6 0 00-3-11z"/><path d="M10 20h4"/></svg><div><b>Gestion catastrophes</b><span>Info &amp; consignes officielles</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 20V9l4-3 4 3 4-5 4 5v11z"/></svg><div><b>Incidents industriels</b><span>SEVESO, chimique, environnement</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M12 9v3M12 15h.01"/></svg><div><b>Menaces &amp; attaques</b><span>Informations &amp; orientation</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg><div><b>Pannes &amp; interruptions</b><span>Énergie, eau, transport, télécoms</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M6 18a4 4 0 010-8 6 6 0 0111-2 4 4 0 011 8z"/></svg><div><b>Événements majeurs</b><span>Grands rassemblements, évacuations</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-4 2-7 6-7s6 3 6 7M17 8h5M19.5 5.5v5"/></svg><div><b>Soutien &amp; orientation</b><span>Aide, services sociaux, infos pratiques</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M8 10h8M8 14h5"/></svg><div><b>Permanence &amp; accueil</b><span>Saturation téléphonique, hors heures</span></div></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="d">
+      <summary>Intégrations possibles</summary>
+      <div class="dbody">
+        <div class="grid">
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 20V10M9 20V5M14 20v-9M19 20V8"/></svg><div><b>Systèmes d’alerte</b><span>SMS, sirènes, Cell Broadcast</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg><div><b>Applications mobiles</b><span>Municipales / régionales</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v14c0 2 3 3 7 3s7-1 7-3V5"/></svg><div><b>Bases de données officielles</b><span>Population, risques, ressources</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M8 10h8M8 14h4"/></svg><div><b>CRM / ticketing</b><span>Suivi des demandes</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 11l7-3M8.5 13l7 3"/></svg><div><b>Réseaux sociaux</b><span>Messagerie, notifications</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zM13 12h7v7h-7z"/><path d="M11 8h2m-1 0v8"/></svg><div><b>Systèmes internes</b><span>ERP, gestion d’équipes</span></div></div>
+          <div class="cell"><svg viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg><div><b>APIs &amp; webhooks</b><span>Sans remplacer vos systèmes</span></div></div>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <!-- ============ BENEFICES ============ -->
+  <section class="benefits">
+    <div class="bar">Les bénéfices pour les organisations</div>
+    <div class="bgrid">
+      <div class="ben"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Réponse plus rapide</b><span>et plus fiable</span></div>
+      <div class="ben"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg><b>Sécurité maximale</b><span>contre les attaques</span></div>
+      <div class="ben"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-4 2-7 6-7s6 3 6 7M17 8h5"/></svg><b>Moins de surcharge</b><span>pour les opérateurs</span></div>
+      <div class="ben"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><b>Traçabilité complète</b><span>et conformité</span></div>
+      <div class="ben"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H8l-4 3z"/></svg><b>Communication claire</b><span>et accessible à tous</span></div>
+      <div class="ben"><svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zM13 12h7v7h-7z"/><path d="M11 8h2m-1 0v8"/></svg><b>Solution évolutive</b><span>et intégrable</span></div>
+    </div>
+  </section>
+
+  <!-- ============ PIED DE PAGE ============ -->
+  <footer>
+    <div class="foot">
+      <div class="fb">
+        <img src="assets/banana-navy-logo.png" alt="Banana Navy" width="400" height="238">
+        <p class="ftag">Trusted voice agents &amp; agentic systems</p>
+      </div>
+      <div class="fbadges">
+        <img src="assets/badge-defence.png" alt="Belgian Defence" width="220" height="142">
+        <img src="assets/badge-crest-royal.png" alt="Per Ardua Gradior — écusson royal" width="112" height="200">
+        <img src="assets/badge-strike-it.png" alt="CY.D3F Factory — STRIKE IT" width="823" height="531">
+        <img src="assets/badge-cyberforce.png" alt="Cyber Force" width="157" height="200">
+      </div>
+      <div class="fc">
+        <span class="who">Marc-Antoine Cajot</span>
+        <a href="tel:+32495277044">+32 495 277 044</a><br>
+        <a href="mailto:marc@banana-navy.com">marc@banana-navy.com</a><br>
+        <a href="https://www.banana-navy.ai" target="_blank" rel="noopener">www.banana-navy.ai</a><br>
+        Rue Antoine de <span class="nb">Saint-Exupéry</span> 2, 6041 Charleroi
+      </div>
+    </div>
+    <p class="fend">Banana Navy a été sélectionnée et est soutenue par la Défense belge dans le cadre du programme STRIKE IT, pour le développement d’une technologie de VoiceBot sécurisée et fiable.
+      <em>Banana Navy has been selected and is supported by the Belgian Defence through the STRIKE IT program for the development of a secure and reliable VoiceBot technology.</em></p>
+  </footer>
+
+</div>
+
+<script>
+(() => {
+  const btn = document.getElementById('toggleAll');
+  const all = [...document.querySelectorAll('details.d')];
+  const label = btn.lastChild;
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    const open = all.some(d => !d.open);
+    all.forEach(d => d.open = open);
+    label.textContent = open ? ' Tout replier' : ' Tout déplier';
+  });
+})();
+</script>
+</body>
+</html>
