@@ -77,6 +77,29 @@ footer{padding:34px 0 50px;color:var(--muted);font-size:12px}.footerbox{display:
 .alarm .alarm-sub b{color:var(--red)}
 @media(max-width:600px){.alarm{padding:18px}}
 
+/* Logos officiels & identite */
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:32px;width:auto;display:block;flex:0 0 auto}
+.brand span{font-size:12px;letter-spacing:.01em;line-height:1.2;max-width:260px}
+.orglogos{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px 30px;margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}
+.orglogos img{height:54px;width:auto;display:block;object-fit:contain}
+.orglogos .lbl{flex-basis:100%;margin:0;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+footer .fgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;padding-bottom:26px}
+footer .fbrand img{height:56px;width:auto;display:block;margin-bottom:14px}
+footer .ftag{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}
+footer .fpillars{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+footer .fpillars li{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--navy);background:var(--soft);border:1px solid #e9eef5;border-radius:999px;padding:6px 11px}
+footer .fcontact h4{margin:0 0 10px;font-size:13px;color:var(--navy);letter-spacing:.04em;text-transform:uppercase}
+footer .fcontact p{margin:0 0 7px;font-size:13px;color:var(--muted);line-height:1.5}
+footer .fcontact a{color:var(--navy);font-weight:600}
+footer .fcontact a:hover{color:var(--blue)}
+footer .fbadges{display:flex;flex-wrap:wrap;align-items:center;gap:12px 26px;padding:20px 0;border-top:1px solid var(--line)}
+footer .fbadges img{height:42px;width:auto;display:block;object-fit:contain}
+footer .fendorse{margin:0 0 6px;font-size:12px;color:var(--muted);max-width:820px;line-height:1.5}
+footer .fendorse-en{margin:0 0 18px;font-size:11px;color:#8190a3;max-width:820px;line-height:1.5;font-style:italic}
+@media(max-width:820px){footer .fgrid{grid-template-columns:1fr;gap:26px}.orglogos img{height:44px}footer .fbadges img{height:36px}}
+@media(max-width:600px){.brand span{display:none}.orglogos{gap:12px 20px}.orglogos img{height:38px}}
+
 /* Interactions & motion */
 .glass,.benefit,.step,.feature,.aud,.card,details,.cta,.promise .item{
   transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, background-color .28s ease, color .28s ease;
@@ -111,7 +134,7 @@ footer{padding:34px 0 50px;color:var(--muted);font-size:12px}.footerbox{display:
 <body>
 <div class="topbar">
   <div class="container nav">
-    <div class="brand">INFRASTRUCTURE CONVERSATIONNELLE SÉCURISÉE</div>
+    <div class="brand"><img src="assets/banana-navy-logo.png" alt="Banana Navy" width="400" height="238"><span>INFRASTRUCTURE CONVERSATIONNELLE SÉCURISÉE</span></div>
     <div class="navlinks">
       <a href="#fonctionnement">Fonctionnement</a><a href="#securite">Sécurité</a><a href="#secteurs">Secteurs</a><a href="#technologie">Technologie</a>
     </div>
@@ -158,6 +181,13 @@ footer{padding:34px 0 50px;color:var(--muted);font-size:12px}.footerbox{display:
   <div class="glass proof">
     <div><span class="stamp">Validation en environnement exigeant</span><h3>Sélectionné dans le programme STRIKE‑IT 2026 de la Défense belge</h3></div>
     <p>Notre projet Voice Bot Navy a été sélectionné dans le cadre du programme STRIKE‑IT 2026, porté par la Cyber Defence Factory / Cyber Command. Le programme vise des innovations de cybersécurité dual-use devant progresser vers une réalité opérationnelle, avec un objectif de maturité TRL 7. Cette sélection conforte notre choix architectural : un agent vocal ne doit pas seulement être intelligent — il doit être protégé, supervisé, traçable et capable de basculer vers des scénarios sûrs lorsque la situation l’exige.</p>
+    <div class="orglogos">
+      <p class="lbl">Programme &amp; institutions partenaires</p>
+      <img src="assets/badge-defence.png" alt="Belgian Defence" width="220" height="142">
+      <img src="assets/badge-crest-royal.png" alt="Per Ardua Gradior — écusson royal" width="112" height="200">
+      <img src="assets/badge-strike-it.png" alt="CY.D3F Factory — STRIKE IT" width="823" height="531">
+      <img src="assets/badge-cyberforce.png" alt="Cyber Force" width="157" height="200">
+    </div>
   </div>
 </div></section>
 <section class="section" id="fonctionnement"><div class="container">
@@ -233,12 +263,39 @@ footer{padding:34px 0 50px;color:var(--muted);font-size:12px}.footerbox{display:
 <section class="section" id="contact"><div class="container">
   <div class="glass" style="padding:30px;display:flex;justify-content:space-between;gap:30px;align-items:center;flex-wrap:wrap">
     <div><h2 style="margin-bottom:8px">Voir comment cette technologie s’intègre à votre organisation</h2><p style="margin:0;color:var(--muted);max-width:720px">Nous pouvons modéliser un parcours concret à partir de vos flux d’appels, de vos contraintes de sécurité, de vos procédures et de vos systèmes existants.</p></div>
-    <a class="cta" href="mailto:contact@exemple.be">Planifier une démonstration</a>
+    <a class="cta" href="mailto:lana@banana-navy.com">Planifier une démonstration</a>
   </div>
 </div></section>
 </main>
 
-<footer><div class="container footerbox"><span>Infrastructure conversationnelle sécurisée</span><span>Document commercial • Version client</span></div></footer>
+<footer><div class="container">
+  <div class="fgrid">
+    <div class="fbrand">
+      <img src="assets/banana-navy-logo.png" alt="Banana Navy" width="400" height="238">
+      <p class="ftag">Trusted voice agents &amp; agentic systems</p>
+      <ul class="fpillars">
+        <li>Disponibilité 24/7</li><li>Hallucination proof</li>
+        <li>Secure by design</li><li>Intégration base de données</li>
+      </ul>
+    </div>
+    <div class="fcontact">
+      <h4>Contact</h4>
+      <p><a href="tel:+32470934302">+32 470 934 302</a></p>
+      <p><a href="mailto:lana@banana-navy.com">lana@banana-navy.com</a></p>
+      <p><a href="https://www.banana-navy.ai" target="_blank" rel="noopener">www.banana-navy.ai</a></p>
+      <p>Rue Antoine de Saint-Exupéry 2<br>6041 Charleroi, Belgique</p>
+    </div>
+  </div>
+  <div class="fbadges">
+    <img src="assets/badge-defence.png" alt="Belgian Defence" width="220" height="142">
+    <img src="assets/badge-crest-royal.png" alt="Per Ardua Gradior — écusson royal" width="112" height="200">
+    <img src="assets/badge-strike-it.png" alt="CY.D3F Factory — STRIKE IT" width="823" height="531">
+    <img src="assets/badge-cyberforce.png" alt="Cyber Force" width="157" height="200">
+  </div>
+  <p class="fendorse">Banana Navy a été sélectionnée et est soutenue par la Défense belge dans le cadre du programme STRIKE IT, pour le développement d’une technologie de VoiceBot sécurisée et fiable.</p>
+  <p class="fendorse-en">Banana Navy has been selected and is supported by the Belgian Defence through the STRIKE IT program for the development of a secure and reliable VoiceBot technology.</p>
+  <div class="footerbox"><span>Banana Navy SRL — Infrastructure conversationnelle sécurisée</span><span>Document commercial • Version client</span></div>
+</div></footer>
 
 <script>
 (() => {
