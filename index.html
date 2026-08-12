@@ -68,6 +68,12 @@ details{border:1px solid var(--line);border-radius:14px;background:#fff;margin-b
 .benefits{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#29405e;border-radius:16px;overflow:hidden}.benefit{background:var(--navy);color:#fff;padding:20px}.benefit h4{font-size:13px;margin:8px 0}.benefit p{font-size:11px;color:rgba(255,255,255,.7);margin:0}.proof{padding:26px;display:grid;grid-template-columns:.8fr 1.2fr;gap:24px;align-items:center;border-left:5px solid var(--blue)}.proof h3{font-size:22px;color:var(--navy);margin:0 0 8px}.proof p{font-size:13px;color:var(--muted);margin:0}.proof .stamp{font-size:12px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.08em}
 footer{padding:34px 0 50px;color:var(--muted);font-size:12px}.footerbox{display:flex;justify-content:space-between;gap:20px;padding-top:18px;border-top:1px solid var(--line)}
 
+.alarm{margin:0 0 26px;padding:22px 26px;border-left:6px solid var(--red);border-radius:14px;background:linear-gradient(90deg,rgba(207,63,79,.10),rgba(207,63,79,0) 70%)}
+.alarm .alarm-head{margin:0;font-size:clamp(26px,4.4vw,46px);line-height:1.04;letter-spacing:-.035em;font-weight:800;color:var(--red);text-transform:uppercase}
+.alarm .alarm-sub{margin:10px 0 0;font-size:clamp(15px,1.9vw,21px);line-height:1.25;font-weight:700;letter-spacing:-.02em;color:var(--navy)}
+.alarm .alarm-sub b{color:var(--red)}
+@media(max-width:600px){.alarm{padding:18px 18px;border-left-width:5px}}
+
 /* Interactions & motion */
 .glass,.benefit,.step,.feature,.aud,.card,details,.cta,.promise .item{
   transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease, background-color .28s ease, color .28s ease;
@@ -112,6 +118,10 @@ footer{padding:34px 0 50px;color:var(--muted);font-size:12px}.footerbox{display:
 
 <header class="hero">
   <div class="container">
+    <div class="alarm">
+      <p class="alarm-head">Stop aux bots talkie-walkie !</p>
+      <p class="alarm-sub">L’ère <b>FULL-DUPLEX</b> sécurisée est enfin sur le marché !</p>
+    </div>
     <span class="eyebrow">Infrastructure vocale intelligente • Sécurisée • Haute disponibilité</span>
     <h1>Une technologie conversationnelle fiable, conçue pour les environnements où l’erreur n’est pas une option.</h1>
     <p>Notre plateforme associe intelligence conversationnelle, sécurité télécom, analyse audio, règles métier et routage automatisé. Elle permet aux organisations de traiter des volumes élevés d’appels, d’orienter les demandes, de détecter les situations sensibles et de maintenir une qualité de service constante, même sous forte charge.</p>
